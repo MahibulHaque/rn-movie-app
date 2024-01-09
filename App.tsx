@@ -5,32 +5,36 @@ import {Text, View, StyleSheet} from 'react-native';
 import TabNavigator from './src/navigator/TabNavigator';
 import MovieDetailScreen from './src/screens/MovieDetailScreen';
 import SeatBookingScreen from './src/screens/SeatBookingScreen';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
 interface AppProps {}
 
 const Stack = createNativeStackNavigator();
+const queryClient = new QueryClient();
 
 const App = (props: AppProps) => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
-        <Stack.Screen
-          name="Tab"
-          component={TabNavigator}
-          options={{animation: 'default'}}
-        />
-        <Stack.Screen
-          name="MovieDetails"
-          component={MovieDetailScreen}
-          options={{animation: 'slide_from_right'}}
-        />
-        <Stack.Screen
-          name="SeatBooking"
-          component={SeatBookingScreen}
-          options={{animation: 'slide_from_bottom'}}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <QueryClientProvider client={queryClient}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+          <Stack.Screen
+            name="Tab"
+            component={TabNavigator}
+            options={{animation: 'default'}}
+          />
+          <Stack.Screen
+            name="MovieDetails"
+            component={MovieDetailScreen}
+            options={{animation: 'slide_from_right'}}
+          />
+          <Stack.Screen
+            name="SeatBooking"
+            component={SeatBookingScreen}
+            options={{animation: 'slide_from_bottom'}}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </QueryClientProvider>
   );
 };
 

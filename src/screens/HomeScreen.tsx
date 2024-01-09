@@ -22,84 +22,79 @@ import InputHeader from '../components/InputHeader';
 import CategoryHeader from '../components/CategoryHeader';
 import MovieCard from '../components/MovieCard';
 import SubMovieCard from '../components/SubMovieCard';
+import {useQuery} from '@tanstack/react-query';
 
 interface HomeScreenProps {}
 
 const {width, height} = Dimensions.get('window');
 
-const getNowPlayingMoviesList = async () => {
-  try {
-    let response = await fetch(nowPlayingMovies);
-    let json = await response.json();
-    return json;
-  } catch (error) {
-    console.error(
-      ' Something went wrong in getNowPlayingMoviesList Function',
-      error,
-    );
-  }
+const fetchNowPlayingMoviesList = async () => {
+  let response = await fetch(nowPlayingMovies);
+  let json = await response.json();
+  return json;
 };
 
-const getUpcomingMoviesList = async () => {
-  try {
-    let response = await fetch(upcomingMovies);
-    let json = await response.json();
-    return json;
-  } catch (error) {
-    console.error(
-      ' Something went wrong in getUpcomingMoviesList Function',
-      error,
-    );
-  }
+const fetchUpcomingMoviesList = async () => {
+  let response = await fetch(upcomingMovies);
+  let json = await response.json();
+  return json;
 };
 
-const getPopularMoviesList = async () => {
-  try {
-    let response = await fetch(popularMovies);
-    let json = await response.json();
-    return json;
-  } catch (error) {
-    console.error(
-      ' Something went wrong in getPopularMoviesList Function',
-      error,
-    );
-  }
+const fetchPopularMoviesList = async () => {
+  let response = await fetch(popularMovies);
+  let json = await response.json();
+  return json;
 };
 
-const HomeScreen = ({navigation}:any) => {
-  const [nowPlayingMoviesList, setNowPlayingMoviesList] =
-    useState<any>(undefined);
-  const [popularMoviesList, setPopularMoviesList] = useState<any>(undefined);
-  const [upcomingMoviesList, setUpcomingMoviesList] = useState<any>(undefined);
+const useNowPlayingMovies = () => {
+  return useQuery({
+    queryKey: ['nowPlayingMovies'],
+    queryFn: fetchNowPlayingMoviesList,
+  });
+};
 
-  useEffect(() => {
-    (async () => {
-      let tempNowPlaying = await getNowPlayingMoviesList();
-      setNowPlayingMoviesList([
-        {id: 'dummy1'},
-        ...tempNowPlaying.results,
-        {id: 'dummy2'},
-      ]);
+const usePopularMovies = () => {
+  return useQuery({
+    queryKey: ['popularMovies'],
+    queryFn: fetchPopularMoviesList,
+  });
+};
 
-      let tempPopular = await getPopularMoviesList();
-      setPopularMoviesList(tempPopular.results);
+const useUpcomingMovies = () => {
+  return useQuery({
+    queryKey: ['upcomingMovies'],
+    queryFn: fetchUpcomingMoviesList,
+  });
+};
 
-      let tempUpcoming = await getUpcomingMoviesList();
-      setUpcomingMoviesList(tempUpcoming.results);
-    })();
-  }, []);
+const HomeScreen = ({navigation}: any) => {
+  const {
+    data: nowPlayingMoviesList,
+    isLoading: isNowPlayingLoading,
+    isError: isNowPlayingError,
+  } = useNowPlayingMovies();
+  const {
+    data: popularMoviesList,
+    isLoading: isPopularLoading,
+    isError: isPopularMoviesError,
+  } = usePopularMovies();
+  const {
+    data: upcomingMoviesList,
+    isLoading: isUpcomingLoading,
+    isError: isUpcomingMoviesError,
+  } = useUpcomingMovies();
 
   const searchMoviesFunction = () => {
     navigation.navigate('Search');
   };
 
   if (
-    nowPlayingMoviesList == undefined &&
-    nowPlayingMoviesList == null &&
-    popularMoviesList == undefined &&
-    popularMoviesList == null &&
-    upcomingMoviesList == undefined &&
-    upcomingMoviesList == null
+    isNowPlayingLoading ||
+    isPopularLoading ||
+    isUpcomingLoading ||
+    isNowPlayingError ||
+    isPopularMoviesError ||
+    isUpcomingMoviesError
   ) {
     return (
       <ScrollView
